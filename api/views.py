@@ -79,8 +79,11 @@ class ForcastForSpecificLocationView(APIView):
         from_loc = request.query_params.get("from_loc")
         to_loc = request.query_params.get("to_loc")
         max_temp = request.query_params.get("max_temp")
-        if not from_loc or not to_loc or not max_temp:
-            return Response({"message": "`from_loc`, `to_loc` and `max_temp` is required"}, status=status.HTTP_404_NOT_FOUND)
+        date = request.query_params.get("date")
+        if not from_loc or not to_loc or not max_temp or not date:
+            return Response({
+                "message": "`from_loc`, `to_loc` and `max_temp` and `date` is required"
+            }, status=status.HTTP_404_NOT_FOUND)
 
         from_dist = search_location(from_loc)
         to_dist = search_location(to_loc)
@@ -98,7 +101,9 @@ class ForcastForSpecificLocationView(APIView):
         params = {
             "latitude": lats,
             "longitude": longs,
-            "hourly": "temperature_2m"
+            "hourly": "temperature_2m",
+            "start_date": date,
+            "end_date": date
         }
         responses = openmeteo.weather_api(url, params=params)
         location = [from_dist, to_dist]
